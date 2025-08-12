@@ -1,0 +1,21 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: gateway-service
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: user-service
+              uri: http://localhost:8081/  # 어디로 이동시킬것인지
+              predicates:
+                - Path=/user-service/**  # 어떤 정보(url 패턴)로 들어온 경우
+
+            - id: product-service
+              uri: http://localhost:8082/  # 어디로 이동시킬것인지
+              predicates:
+                - Path=/product-service/**  # 어떤 정보(url 패턴)로 들어온 경우

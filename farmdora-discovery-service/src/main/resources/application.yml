@@ -1,0 +1,11 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: farmdora-discovery-service  # 애플리케이션명을 마이크로서비스의 고유아이디로 지정
+
+eureka:
+  client:
+    register-with-eureka: false  # Eureka 서버에 자신을 등록하지 않겠다는 의미 (기본값 : true)
+    fetch-registry: false        # Eureka 서버로부터 다른 마이크로서비스들의 정보를 가져오지 않겠다는 의미 (기본값 : true)

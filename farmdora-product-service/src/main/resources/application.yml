@@ -1,0 +1,13 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: product-service
+
+eureka:
+  client:
+    register-with-eureka: true  # Eureka 서버에 이 서버를 등록한다.
+    fetch-registry: true  # Eureka 서버로부터 다른 인스턴스들의 정보를 주기적으로 가져온다.
+    service-url:
+      defaultZone: http://localhost:8761/eureka  # Eureka 엔드포인트에 현재 마이크로 서비스의 정보를 등록한다.
