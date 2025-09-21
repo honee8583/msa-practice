@@ -7,6 +7,7 @@ import com.example.boardservice.dto.CreateBoardRequestDto;
 import com.example.boardservice.domain.BoardRepository;
 import com.example.boardservice.dto.UserDto;
 import com.example.boardservice.dto.UserResponseDto;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +33,16 @@ public class BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다!"));
 
-        UserResponseDto userResponseDto = userClient.fetchUser(board.getUserId());
+        Optional<UserResponseDto> optionalUserResponseDto = userClient.fetchUser(board.getUserId());
 
-        UserDto userDto = UserDto.builder()
-                .userId(userResponseDto.getUserId())
-                .name(userResponseDto.getName())
-                .build();
+        UserDto userDto = null;
+        if (optionalUserResponseDto.isPresent()) {
+            UserResponseDto userResponseDto = optionalUserResponseDto.get();
+            userDto = UserDto.builder()
+                    .userId(userResponseDto.getUserId())
+                    .name(userResponseDto.getName())
+                    .build();
+        }
 
         return BoardResponseDto.builder()
                 .boardId(board.getBoardId())
