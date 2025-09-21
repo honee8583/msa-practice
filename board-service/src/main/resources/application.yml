@@ -12,3 +12,7 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+
+client:
+  user-service:
+    url: http://localhost:8080

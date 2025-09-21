@@ -3,6 +3,7 @@ package com.example.userservice.service;
 import com.example.userservice.domain.User;
 import com.example.userservice.dto.SignUpRequestDto;
 import com.example.userservice.domain.UserRepository;
+import com.example.userservice.dto.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,5 +22,16 @@ public class UserService {
                 .password(signUpRequestDto.getPassword())
                 .build();
         userRepository.save(user);
+    }
+
+    public UserResponseDto getUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다!"));
+
+        return UserResponseDto.builder()
+                .userId(user.getUserId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
     }
 }
