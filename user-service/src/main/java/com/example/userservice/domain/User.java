@@ -25,4 +25,11 @@ public class User {
 
     private String password;
 
+    @Builder.Default
+    private int activityScore = 0;
+
+    public void addActivityScore(int score) {
+        this.activityScore += score;
+    }
+
 }

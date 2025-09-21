@@ -1,9 +1,9 @@
 server:
-  port: 8080
+  port: 8082
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/user-db
+    url: jdbc:mysql://localhost:3308/point-db
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 1111
@@ -12,7 +12,3 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
-
-client:
-  point-service:
-    url: http://localhost:8082
