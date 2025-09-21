@@ -4,6 +4,7 @@ import com.example.userservice.domain.User;
 import com.example.userservice.dto.SignUpRequestDto;
 import com.example.userservice.domain.UserRepository;
 import com.example.userservice.dto.UserResponseDto;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,5 +34,18 @@ public class UserService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .build();
+    }
+
+    public List<UserResponseDto> getUsersByIds(List<Long> ids) {
+        List<User> users = userRepository.findAllById(ids);
+
+        return users.stream()
+                .map(user -> UserResponseDto.builder()
+                        .userId(user.getUserId())
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .build()
+                )
+                .toList();
     }
 }

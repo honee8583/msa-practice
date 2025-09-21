@@ -3,6 +3,7 @@ package com.example.boardservice.controller;
 import com.example.boardservice.dto.BoardResponseDto;
 import com.example.boardservice.dto.CreateBoardRequestDto;
 import com.example.boardservice.service.BoardService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,5 +30,11 @@ public class BoardController {
     public ResponseEntity<BoardResponseDto> getBoard(@PathVariable("boardId") Long boardId) {
         BoardResponseDto boardResponseDto = boardService.getBoard(boardId);
         return ResponseEntity.ok(boardResponseDto);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getBoards() {
+        List<BoardResponseDto> boards = boardService.getBoards();
+        return ResponseEntity.ok(boards);
     }
 }

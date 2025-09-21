@@ -7,6 +7,9 @@ import com.example.boardservice.dto.CreateBoardRequestDto;
 import com.example.boardservice.domain.BoardRepository;
 import com.example.boardservice.dto.UserDto;
 import com.example.boardservice.dto.UserResponseDto;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,5 +53,33 @@ public class BoardService {
                 .content(board.getContent())
                 .user(userDto)
                 .build();
+    }
+
+    public List<BoardResponseDto> getBoards() {
+        List<Board> boards = boardRepository.findAll();
+
+        // userId 목록 추출
+        List<Long> userIds = boards.stream()
+                .map(board -> board.getUserId())
+                .distinct()
+                .toList();
+
+        List<UserResponseDto> userResponseDtos = userClient.fetchUsersByIds(userIds);
+
+        Map<Long, UserDto> userMap = new HashMap<>();
+        for (UserResponseDto userResponseDto : userResponseDtos) {
+            Long userId = userResponseDto.getUserId();
+            String name = userResponseDto.getName();
+            userMap.put(userId, new UserDto(userId, name));
+        }
+
+        return boards.stream()
+                .map(board -> BoardResponseDto.builder()
+                        .boardId(board.getBoardId())
+                        .title(board.getTitle())
+                        .content(board.getContent())
+                        .user(userMap.get(board.getUserId()))
+                        .build())
+                .toList();
     }
 }
