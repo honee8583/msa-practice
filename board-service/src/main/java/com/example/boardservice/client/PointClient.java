@@ -1,5 +1,6 @@
 package com.example.boardservice.client;
 
+import com.example.boardservice.dto.AddPointsRequestDto;
 import com.example.boardservice.dto.DeductPointsRequestDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,20 @@ public class PointClient {
                 .uri("/points/deduct")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(deductPointsRequestDto)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public void addPoints(Long userId, int amount) {
+        AddPointsRequestDto addPointsRequestDto = AddPointsRequestDto.builder()
+                .userId(userId)
+                .amount(amount)
+                .build();
+
+        restClient.post()
+                .uri("/points/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(addPointsRequestDto)
                 .retrieve()
                 .toBodilessEntity();
     }

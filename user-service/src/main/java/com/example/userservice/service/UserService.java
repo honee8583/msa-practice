@@ -64,5 +64,14 @@ public class UserService {
         user.addActivityScore(addActivityScoreRequestDto.getScore());
 
         userRepository.save(user);
+
+//        throw new RuntimeException("활동 점수 적립 에러 발생");
+
+        // 10초 대기
+        try {
+            Thread.sleep(10000);
+        } catch (Exception e) {
+
+        }
     }
 }

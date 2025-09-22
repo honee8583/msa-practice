@@ -55,20 +55,16 @@ public class UserClient {
     }
 
     public void addActivityScore(Long userId, int score) {
-        try {
-            AddActivityScoreRequestDto addActivityScoreRequestDto = AddActivityScoreRequestDto.builder()
-                    .userId(userId)
-                    .score(score)
-                    .build();
+        AddActivityScoreRequestDto addActivityScoreRequestDto = AddActivityScoreRequestDto.builder()
+                .userId(userId)
+                .score(score)
+                .build();
 
-            restClient.post()
-                    .uri("/users/activity-score/add")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(addActivityScoreRequestDto)
-                    .retrieve()
-                    .toBodilessEntity();
-        } catch (RestClientException e) {
-            log.error("활동 점수 적립 실패");
-        }
+        restClient.post()
+                .uri("/users/activity-score/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(addActivityScoreRequestDto)
+                .retrieve()
+                .toBodilessEntity();
     }
 }
