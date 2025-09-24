@@ -28,13 +28,15 @@ public class BoardController {
 
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardResponseDto> getBoard(@PathVariable("boardId") Long boardId) {
-        BoardResponseDto boardResponseDto = boardService.getBoard(boardId);
+//        BoardResponseDto boardResponseDto = boardService.getBoard(boardId);
+        BoardResponseDto boardResponseDto = boardService.getBoard2(boardId);
         return ResponseEntity.ok(boardResponseDto);
     }
 
     @GetMapping
     public ResponseEntity<?> getBoards() {
-        List<BoardResponseDto> boards = boardService.getBoards();
+//        List<BoardResponseDto> boards = boardService.getBoards();
+        List<BoardResponseDto> boards = boardService.getBoards2();
         return ResponseEntity.ok(boards);
     }
 }

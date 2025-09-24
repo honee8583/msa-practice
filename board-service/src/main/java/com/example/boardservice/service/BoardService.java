@@ -104,6 +104,23 @@ public class BoardService {
                 .build();
     }
 
+    public BoardResponseDto getBoard2(Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다!"));
+
+        return BoardResponseDto.builder()
+                .boardId(board.getBoardId())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .user(
+                        UserDto.builder()
+                                .userId(board.getUser().getUserId())
+                                .name(board.getUser().getName())
+                                .build()
+                )
+                .build();
+    }
+
     private String toJsonString(Object object) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -138,6 +155,24 @@ public class BoardService {
                         .title(board.getTitle())
                         .content(board.getContent())
                         .user(userMap.get(board.getUserId()))
+                        .build())
+                .toList();
+    }
+
+    public List<BoardResponseDto> getBoards2() {
+        List<Board> boards = boardRepository.findAll();
+
+        return boards.stream()
+                .map(board -> BoardResponseDto.builder()
+                        .boardId(board.getBoardId())
+                        .title(board.getTitle())
+                        .content(board.getContent())
+                        .user(
+                                UserDto.builder()
+                                        .userId(board.getUser().getUserId())
+                                        .name(board.getUser().getName())
+                                        .build()
+                        )
                         .build())
                 .toList();
     }
