@@ -7,8 +7,12 @@ import com.example.userservice.dto.AddPointsRequestDto;
 import com.example.userservice.dto.SignUpRequestDto;
 import com.example.userservice.domain.UserRepository;
 import com.example.userservice.dto.UserResponseDto;
+import com.example.userservice.event.UserSignedUpEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PointClient pointClient;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Transactional
     public void signUp(SignUpRequestDto signUpRequestDto) {
@@ -30,6 +35,23 @@ public class UserService {
 
         // 회원가입시 1000점 적립
         pointClient.addPoints(savedUser.getUserId(), 1000);
+        
+        // 회원가입 완료 이벤트 발행
+        UserSignedUpEvent userSignedUpEvent = UserSignedUpEvent.builder()
+                .userId(savedUser.getUserId())
+                .name(savedUser.getName())
+                .build();
+        kafkaTemplate.send("user.signed-up", toJsonString(userSignedUpEvent));
+    }
+
+    private String toJsonString(Object object) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String message = objectMapper.writeValueAsString(object);
+            return message;
+        } catch(JsonProcessingException e) {
+            throw new RuntimeException("Json 직렬화 실패");
+        }
     }
 
     public UserResponseDto getUser(Long userId) {
