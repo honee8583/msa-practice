@@ -8,12 +8,16 @@ import com.example.boardservice.dto.CreateBoardRequestDto;
 import com.example.boardservice.domain.BoardRepository;
 import com.example.boardservice.dto.UserDto;
 import com.example.boardservice.dto.UserResponseDto;
+import com.example.boardservice.event.BoardCreatedEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +29,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final UserClient userClient;
     private final PointClient pointClient;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
 //    @Transactional
     public void create(CreateBoardRequestDto createBoardRequestDto) {
@@ -53,8 +58,11 @@ public class BoardService {
 
             // 작성자 활동 점수 적립
             // 마지막 처리이므로 보상 트랜잭션을 적용시킬 필요가 없다
-            userClient.addActivityScore(savedBoard.getUserId(), 10);
-            log.info("포인트 적립 성공");
+//            userClient.addActivityScore(savedBoard.getUserId(), 10);
+//            log.info("포인트 적립 성공");
+            BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(createBoardRequestDto.getUserId());
+            kafkaTemplate.send("board.created", toJsonString(boardCreatedEvent));
+            log.info("게시글 작성 완료 이벤트 발행");
         } catch(Exception e) {
             if (isBoardCreated) {
                 // 게시글 작성 보상 트랜잭션 => 게시글 삭제
@@ -94,6 +102,16 @@ public class BoardService {
                 .content(board.getContent())
                 .user(userDto)
                 .build();
+    }
+
+    private String toJsonString(Object object) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String message = objectMapper.writeValueAsString(object);
+            return message;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Json 직렬화 실패");
+        }
     }
 
     public List<BoardResponseDto> getBoards() {
