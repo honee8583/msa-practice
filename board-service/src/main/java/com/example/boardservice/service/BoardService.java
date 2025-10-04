@@ -32,7 +32,7 @@ public class BoardService {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
 //    @Transactional
-    public void create(CreateBoardRequestDto createBoardRequestDto) {
+    public void create(CreateBoardRequestDto createBoardRequestDto, Long userId) {
         // 게시글 저장을 성공했는지 판단하는 플래그
         boolean isBoardCreated = false;
         Long savedBoardId = null;
@@ -41,7 +41,7 @@ public class BoardService {
         boolean isPointDeducted = false;
         try {
             // 포인트 차감
-            pointClient.deductPoints(createBoardRequestDto.getUserId(), 100);
+            pointClient.deductPoints(userId, 100);
             isPointDeducted = true; // 포인트 차감 성공
             log.info("포인트 차감 성공");
 
@@ -49,7 +49,7 @@ public class BoardService {
             Board board = Board.builder()
                     .title(createBoardRequestDto.getTitle())
                     .content(createBoardRequestDto.getContent())
-                    .userId(createBoardRequestDto.getUserId())
+                    .userId(userId)
                     .build();
             Board savedBoard = boardRepository.save(board);
             savedBoardId = savedBoard.getBoardId();
@@ -60,7 +60,7 @@ public class BoardService {
             // 마지막 처리이므로 보상 트랜잭션을 적용시킬 필요가 없다
 //            userClient.addActivityScore(savedBoard.getUserId(), 10);
 //            log.info("포인트 적립 성공");
-            BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(createBoardRequestDto.getUserId());
+            BoardCreatedEvent boardCreatedEvent = new BoardCreatedEvent(userId);
             kafkaTemplate.send("board.created", toJsonString(boardCreatedEvent));
             log.info("게시글 작성 완료 이벤트 발행");
         } catch(Exception e) {
@@ -72,7 +72,7 @@ public class BoardService {
 
             if (isPointDeducted) {
                 // 포인트 차감 보상 트랜잭션 => 포인트 적립
-                pointClient.addPoints(createBoardRequestDto.getUserId(), 100);
+                pointClient.addPoints(userId, 100);
                 log.info("[보상 트랜잭션] 포인트 적립");
             }
 

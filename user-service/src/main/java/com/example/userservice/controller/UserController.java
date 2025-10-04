@@ -1,5 +1,7 @@
 package com.example.userservice.controller;
 
+import com.example.userservice.dto.LoginRequestDto;
+import com.example.userservice.dto.LoginResponseDto;
 import com.example.userservice.dto.SignUpRequestDto;
 import com.example.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,12 @@ public class UserController {
     public ResponseEntity<?> signUp(@RequestBody SignUpRequestDto signUpRequestDto) {
         userService.signUp(signUpRequestDto);
         return ResponseEntity.noContent().build(); // 204
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginRequestDto) {
+        LoginResponseDto loginResponseDto = userService.login(loginRequestDto);
+        return ResponseEntity.ok(loginResponseDto);
     }
 
 }
